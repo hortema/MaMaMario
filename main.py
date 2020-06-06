@@ -46,17 +46,20 @@ clock = pg.time.Clock()
 bg1 = pg.image.load("BG1.jpg")
 bg2 = pg.image.load("CMON.png")
 
-thebg = bg1
-gvt = 9.8
-
+class Planet():
+    def __init__(self, inBG, inGv, inName):
+        self.bg = inBG
+        self.gv = inGv
+        self.name = inName
 level = 0
 Dead = 1
 
+earth = Planet(bg1, 9.8, "Earth")
+moon = Planet(bg2, 1.62, "Moon")
+currentLocation = earth
+
 def level1():
-    global level, squarex, squarey, box, Dead, thebg, gvt
-
-
-
+    global level, squarex, squarey, box, Dead, currentLocation, earth, moon
 
     while level == 0:
         pg.event.pump()
@@ -72,8 +75,8 @@ def level1():
         #events
 
         squarex = 0
-        
-        squarey += gvt
+
+        squarey += currentLocation.gv
         #gravity
 
         if keys[pg.K_a] ==True:
@@ -101,21 +104,19 @@ def level1():
             squarex = 0
             box[0] = 0
             #NO DRIVE THRU DA LEFT WALL
-        
+
         #else:
             #squarex = 0
             #squarey = 20
             #boxColour = (158, 54, 179)
 
         if keys[pg.K_e] ==True:
-            thebg = bg1
-            gvt = 9.8
+            currentLocation = earth
         if keys[pg.K_m] ==True:
-            thebg = bg2
-            gvt = 1.62
-        screen.blit(thebg, (0,0))
+            currentLocation = moon
+        screen.blit(currentLocation.bg, (0,0))
         pg.display.flip
-        
+
 
         #pg.draw.rect (screen,Mud, mud)
 
@@ -124,8 +125,6 @@ def level1():
         pg.display.flip()
 
         clock.tick(30)
-
-
 while True:
     if level == 0:
         level1()
