@@ -122,8 +122,8 @@ def level1():
         #events
         for event in pg.event.get():
             if event.type == pg.locals.QUIT:
-                pg.quit()
-                sys.exit()
+                Quit = 1
+                return
 
         #gravity
 
@@ -146,3 +146,7 @@ while True:
         level1()
     if level == 1:
         pass
+
+    if Quit == 1:
+        pg.quit()
+        break
