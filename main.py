@@ -1,9 +1,13 @@
 
 import pygame as pg
+import sys
 
 from sys import path
 from sys import exit
 import os
+
+from pygame.locals import QUIT
+
 
 #my_path = os.path.dirname(os.path.realpath(__file__))
 #os.chdir(my_path)
@@ -49,6 +53,8 @@ class Planet():
         self.name = inName
 level = 0
 Dead = 1
+
+Quit = 0
 
 class Player():
     def __init__(self, startX, startY, col, uKey, lKey, rKey):
@@ -98,7 +104,7 @@ moon = Planet(bg2, 1.62, "Moon")
 currentPlanet = earth
 
 def level1():
-    global level, Dead, currentPlanet, earth, moon
+    global level, Dead, currentPlanet, earth, moon, Quit
 
     player1 = Player(375,250,white, pg.K_w, pg.K_a, pg.K_d)
     player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l)
@@ -108,14 +114,16 @@ def level1():
 
         screen.blit(currentPlanet.bg, (0,0))
 
-
-
         #inputs
         mx,my = pg.mouse.get_pos()
         L,M,R = pg.mouse.get_pressed() #1/0 : 1-pressed
         keys = pg.key.get_pressed()
 
         #events
+        for event in pg.event.get():
+            if event.type == pg.locals.QUIT:
+                pg.quit()
+                sys.exit()
 
         #gravity
 
