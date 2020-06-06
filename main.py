@@ -25,9 +25,6 @@ boxColour = (158, 54, 179)
 mouse = pg.Rect(100,100,0,0)
 mud = pg.Rect(0,550,800,50)
 
-squarex = 0
-squarey = 0
-
 screenx = 800
 screeny = 600
 
@@ -41,7 +38,6 @@ pg.init()
 screen = pg.display.set_mode((screenx,screeny)) #set your window size, (x,y)
 pg.display.set_caption("Finite State Machines")
 clock = pg.time.Clock()
-
 
 bg1 = pg.image.load("BG1.jpg")
 bg2 = pg.image.load("CMON.png")
@@ -64,44 +60,45 @@ class Player():
         self.leftKey = lKey
         self.rightKey = rKey
 
-    def update( self, location ):
+    def update( self, planet, keys ):
         self.box[0] += self.speedx
         self.box[1] += self.speedy
         self.speedx = 0
-        self.speedy += location.gv
+        self.speedy += planet.gv
+
+        if keys[self.leftKey] ==True:
+            self.speedx = -10
+        elif keys[self.rightKey] ==True:
+            self.speedx = 10
+
+        if keys[self.upKey] == True and self.box[1] >= screeny - self.box[3]:
+            self.speedy = -60
+
+        if self.box[1]<= 0 and self.speedy < 0:
+            self.speedy = 0
+            self.box[1] = 0
+            # if touch sky no go thru
+        if self.box[1] >= screeny - self.box[3] and self.speedy > 0:
+            self.speedy = 0
+            self.box[1] = screeny - self.box[3]
+            #IF TOUCH GROUND STAY GROUNDED
+        if (self.box[0] + self.box[2]) >= screenx and self.speedx > 0:
+            self.speedx = 0
+            self.box[0] = screenx - self.box[2]
+            #IF U TOUCH DA RIGHT WALL NO MOVE PLS
+        if self.box[0] <= 0 and self.speedx < 0:
+            self.speedx = 0
+            self.box[0] = 0
+            #NO DRIVE THRU DA LEFT WALL
+
+        pg.draw.rect(screen,self.colour,self.box)
 
 earth = Planet(bg1, 9.8, "Earth")
 moon = Planet(bg2, 1.62, "Moon")
-currentLocation = earth
-
-def updatePlayer( player, keys ):
-    if keys[player.leftKey] ==True:
-        player.speedx = -10
-    elif keys[player.rightKey] ==True:
-        player.speedx = 10
-
-    if keys[player.upKey] == True and player.box[1] >= 600 - player.box[3]:
-        player.speedy = -60
-
-    if player.box[1]<= 0 and player.speedy < 0:
-        player.speedy = 0
-        player.box[1] = 0
-        # if touch sky no go thru
-    if player.box[1] >= 600 - player.box[3] and player.speedy > 0:
-        player.speedy = 0
-        player.box[1] = 600 - player.box[3]
-        #IF TOUCH GROUND STAY GROUNDED
-    if (player.box[0] + player.box[2]) >= 800 and player.speedx > 0:
-        player.speedx = 0
-        player.box[0] = 800 - player.box[2]
-        #IF U TOUCH DA RIGHT WALL NO MOVE PLS
-    if player.box[0] <= 0 and player.speedx < 0:
-        player.speedx = 0
-        player.box[0] = 0
-        #NO DRIVE THRU DA LEFT WALL
+currentPlanet = earth
 
 def level1():
-    global level, squarex, squarey, box, Dead, currentLocation, earth, moon
+    global level, Dead, currentPlanet, earth, moon
 
     player1 = Player(375,250,white, pg.K_w, pg.K_a, pg.K_d)
     player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l)
@@ -109,10 +106,8 @@ def level1():
     while level == 0:
         pg.event.pump()
 
-        #box[0] += squarex
-        #box[1] += squarey
-        player1.update(currentLocation)
-        player2.update(currentLocation)
+        screen.blit(currentPlanet.bg, (0,0))
+
 
 
         #inputs
@@ -122,29 +117,22 @@ def level1():
 
         #events
 
-        #squarex = 0
-
-        #squarey += currentLocation.gv
         #gravity
 
-        updatePlayer(player1, keys)
-        updatePlayer(player2, keys)
+        player1.update(currentPlanet, keys)
+        player2.update(currentPlanet, keys)
 
         if keys[pg.K_e] ==True:
-            currentLocation = earth
+            currentPlanet = earth
         if keys[pg.K_m] ==True:
-            currentLocation = moon
-        screen.blit(currentLocation.bg, (0,0))
-        pg.display.flip
-
+            currentPlanet = moon
 
         #pg.draw.rect (screen,Mud, mud)
 
-        pg.draw.rect(screen,player1.colour,player1.box)
-        pg.draw.rect(screen,player2.colour,player2.box)
         pg.display.flip()
 
         clock.tick(30)
+
 while True:
     if level == 0:
         level1()
