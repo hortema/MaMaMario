@@ -20,7 +20,7 @@ Grass = (41, 204, 109)
 Mud = (128, 74, 52)
 
 
-box = pg.Rect(375,250,50,100)
+#box = pg.Rect(375,250,50,100)
 boxColour = (158, 54, 179)
 mouse = pg.Rect(100,100,0,0)
 mud = pg.Rect(0,550,800,50)
@@ -54,18 +54,63 @@ class Planet():
 level = 0
 Dead = 1
 
+class Player():
+    def __init__(self, startX, startY, col):
+        self.box = pg.Rect(startX,startY,50,100)
+        self.speedx = 0
+        self.speedy = 0
+        self.colour = col
+
+    def update( self, location ):
+        self.box[0] += self.speedx
+        self.box[1] += self.speedy
+        self.speedx = 0
+        self.speedy += location.gv
+
 earth = Planet(bg1, 9.8, "Earth")
 moon = Planet(bg2, 1.62, "Moon")
 currentLocation = earth
 
+def updatePlayer( player, keys ):
+    if keys[pg.K_a] ==True:
+        player.speedx = -10
+    elif keys[pg.K_d] ==True:
+        player.speedx = 10
+
+    if keys[pg.K_w] == True and player.box[1] >= 600 - player.box[3]:
+        player.speedy = -60
+
+    if player.box[1]<= 0 and player.speedy < 0:
+        player.speedy = 0
+        player.box[1] = 0
+        # if touch sky no go thru
+    if player.box[1] >= 600 - player.box[3] and player.speedy > 0:
+        player.speedy = 0
+        player.box[1] = 600 - player.box[3]
+        #IF TOUCH GROUND STAY GROUNDED
+    if (player.box[0] + player.box[2]) >= 800 and player.speedx > 0:
+        player.speedx = 0
+        player.box[0] = 800 - player.box[2]
+        #IF U TOUCH DA RIGHT WALL NO MOVE PLS
+    if player.box[0] <= 0 and player.speedx < 0:
+        player.speedx = 0
+        player.box[0] = 0
+        #NO DRIVE THRU DA LEFT WALL
+
 def level1():
     global level, squarex, squarey, box, Dead, currentLocation, earth, moon
+
+    player1 = Player(375,250,white)
+    player2 = Player(10,250,blue)
 
     while level == 0:
         pg.event.pump()
 
-        box[0] += squarex
-        box[1] += squarey
+        #box[0] += squarex
+        #box[1] += squarey
+        player1.update(currentLocation)
+        player2.update(currentLocation)
+
 
         #inputs
         mx,my = pg.mouse.get_pos()
@@ -74,41 +119,13 @@ def level1():
 
         #events
 
-        squarex = 0
+        #squarex = 0
 
-        squarey += currentLocation.gv
+        #squarey += currentLocation.gv
         #gravity
 
-        if keys[pg.K_a] ==True:
-            squarex = -10
-        elif keys[pg.K_d] ==True:
-            squarex = 10
-        #elif keys[pg.K_s] == True:
-            #squarey = 10
-        if keys[pg.K_w] == True and box[1] >= 600 - box[3]:
-            squarey = -60
-
-        if box[1]<= 0 and squarey < 0:
-            squarey = 0
-            box[1] = 0
-            # if touch sky no go thru
-        if box[1] >= 600 - box[3] and squarey > 0:
-            squarey = 0
-            box[1] = 600 - box[3]
-            #IF TOUCH GROUND STAY GROUNDED
-        if (box[0] + box[2]) >= 800 and squarex > 0:
-            squarex = 0
-            box[0] = 800 - box[2]
-            #IF U TOUCH DA RIGHT WALL NO MOVE PLS
-        if box[0] <= 0 and squarex < 0:
-            squarex = 0
-            box[0] = 0
-            #NO DRIVE THRU DA LEFT WALL
-
-        #else:
-            #squarex = 0
-            #squarey = 20
-            #boxColour = (158, 54, 179)
+        updatePlayer(player1, keys)
+        updatePlayer(player2, keys)
 
         if keys[pg.K_e] ==True:
             currentLocation = earth
@@ -120,8 +137,8 @@ def level1():
 
         #pg.draw.rect (screen,Mud, mud)
 
-        pg.draw.rect(screen,white,box)
-
+        pg.draw.rect(screen,player1.colour,player1.box)
+        pg.draw.rect(screen,player2.colour,player2.box)
         pg.display.flip()
 
         clock.tick(30)
