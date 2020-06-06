@@ -55,11 +55,14 @@ level = 0
 Dead = 1
 
 class Player():
-    def __init__(self, startX, startY, col):
+    def __init__(self, startX, startY, col, uKey, lKey, rKey):
         self.box = pg.Rect(startX,startY,50,100)
         self.speedx = 0
         self.speedy = 0
         self.colour = col
+        self.upKey = uKey
+        self.leftKey = lKey
+        self.rightKey = rKey
 
     def update( self, location ):
         self.box[0] += self.speedx
@@ -72,12 +75,12 @@ moon = Planet(bg2, 1.62, "Moon")
 currentLocation = earth
 
 def updatePlayer( player, keys ):
-    if keys[pg.K_a] ==True:
+    if keys[player.leftKey] ==True:
         player.speedx = -10
-    elif keys[pg.K_d] ==True:
+    elif keys[player.rightKey] ==True:
         player.speedx = 10
 
-    if keys[pg.K_w] == True and player.box[1] >= 600 - player.box[3]:
+    if keys[player.upKey] == True and player.box[1] >= 600 - player.box[3]:
         player.speedy = -60
 
     if player.box[1]<= 0 and player.speedy < 0:
@@ -100,8 +103,8 @@ def updatePlayer( player, keys ):
 def level1():
     global level, squarex, squarey, box, Dead, currentLocation, earth, moon
 
-    player1 = Player(375,250,white)
-    player2 = Player(10,250,blue)
+    player1 = Player(375,250,white, pg.K_w, pg.K_a, pg.K_d)
+    player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l)
 
     while level == 0:
         pg.event.pump()
