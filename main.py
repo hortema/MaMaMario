@@ -63,10 +63,46 @@ levelone = [
 "                    ",
 "                    ",
 "                    ",
-"         GGG        ",
 "                    ",
-"            MM      ",
+"                    ",
+"                    ",
 "       WWWW         ",
+]
+
+leveltwo = [
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"       WWWW         ",
+"       WWWW         ",
+"WWWWWWWWWWWWWWWWWWWW",
+]
+
+levelthree = [
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"WWWWWWWLLLLWWWWWWWWW",
 ]
 
 
@@ -98,6 +134,9 @@ Dead = 1
 
 Quit = 0
 
+def printBox( box, name ):
+    print("{}, x={}, y={}, w={}, h={} t={} b={}".format( name, box.x, box.y, box.w, box.h, box.top, box.bottom ) )
+
 class Player():
     def __init__(self, startX, startY, col, uKey, lKey, rKey):
         self.box = pg.Rect(startX,startY,50,100)
@@ -111,11 +150,6 @@ class Player():
         self.onGround = False
 
     def update( self, planet, keys ):
-        self.box[0] += self.speedx
-        self.box[1] += self.speedy
-        self.speedx = 0
-        self.speedy += planet.gv
-
         if keys[self.leftKey] ==True:
             self.speedx = -9
         elif keys[self.rightKey] ==True:
@@ -126,59 +160,67 @@ class Player():
 
         self.onGround = False # reset onGround flag
 
-        if self.box.top <= 0 and self.speedy < 0: # if touch sky no go thru
+        futureboxX = pg.Rect(self.box)
+        futureboxX.x += self.speedx
+        futureboxX.union_ip(self.box)
+        futureboxY = pg.Rect(self.box)
+        futureboxY.y += self.speedy
+        futureboxY.union_ip(self.box)
+
+        for wall in walls:
+            fXCollided = futureboxX.colliderect(wall.rect)
+            fYCollided = futureboxY.colliderect(wall.rect)
+            if fXCollided or fYCollided:
+                print ("speed {} {}, fXCollided {}, fYCollided {}".format(self.speedx, self.speedy, fXCollided, fYCollided ) )
+                printBox(wall.rect, "wall.rect")
+                printBox(self.box, "self.box")
+                printBox(futureboxX, "fX")
+                printBox(futureboxY, "fY")
+            #if futurebox.colliderect(wall.rect):
+            if self.speedx > 0 and fXCollided: # Moving right; Hit the left side of the wall
+                self.speedx = 0
+                self.box.right = wall.rect.left
+            elif self.speedx < 0 and fXCollided: # Moving left; Hit the right side of the wall
+                self.speedx = 0
+                self.box.left = wall.rect.right
+            if self.speedy > 0 and fYCollided: # Moving down; Hit the top side of the wall
+                self.speedy = 0
+                self.box.bottom = wall.rect.top
+                self.onGround = True # on the top of the wall is like on the ground YEET!
+            elif self.speedy < 0 and fYCollided: # Moving up; Hit the bottom side of the wall
+                self.speedy = 0
+                self.box.top = wall.rect.bottom
+
+        if futureboxY.top <= 0 and self.speedy < 0: # if touch sky no go thru
             self.speedy = 0
             self.box.top = 0
-        if self.box.bottom >= screeny and self.speedy > 0: #IF TOUCH GROUND STAY GROUNDED
+        elif futureboxY.bottom >= screeny and self.speedy > 0: #IF TOUCH GROUND STAY GROUNDED
             self.speedy = 0
             self.box.bottom = screeny
             self.onGround = True #yes we are on the ground YEET!!
-        if self.box.right >= screenx and self.speedx > 0: #IF U TOUCH DA RIGHT WALL NO MOVE PLS
+        if futureboxX.right >= screenx and self.speedx > 0: #IF U TOUCH DA RIGHT WALL NO MOVE PLS
             self.speedx = 0
             self.box.right = screenx
-        if self.box.left <= 0 and self.speedx < 0: #NO DRIVE THRU DA LEFT WALL
+        elif futureboxX.left <= 0 and self.speedx < 0: #NO DRIVE THRU DA LEFT WALL
             self.speedx = 0
             self.box.left = 0
 
-        futurebox = self.box
-        futurebox.x += self.speedx
-        futurebox.y += self.speedy
-        for wall in walls:
-            alreadyCollided = self.box.colliderect(wall.rect)
-            if futurebox.colliderect(wall.rect):
-                if self.speedx > 0: # Moving right; Hit the left side of the wall
-                    self.speedx = 0
-                    if alreadyCollided:
-                        self.box.right = wall.rect.left - 1
-                elif self.speedx < 0: # Moving left; Hit the right side of the wall
-                    self.speedx = 0
-                    if alreadyCollided:
-                        self.box.left = wall.rect.right + 1
-                if self.speedy > 0: # Moving down; Hit the top side of the wall
-                    self.speedy = 0
-                    if alreadyCollided:
-                        self.box.bottom = wall.rect.top - 1
-                        self.onGround = True # on the top of the wall is like on the ground YEET!
-                elif self.speedy < 0: # Moving up; Hit the bottom side of the wall
-                    self.speedy = 0
-                    if alreadyCollided:
-                        self.box.top = wall.rect.bottom + 1
-
-        #for wall in walls:
-            #if self.box.colliderect(wall.rect):
-                #if self.speedx > 0: # Moving right; Hit the left side of the wall
-                    #self.box.right = wall.rect.left
-                #if self.speedx < 0: # Moving left; Hit the right side of the wall
-                    #self.box.left = wall.rect.right
-                #if self.speedy > 0: # Moving down; Hit the top side of the wall
-                    #self.box.bottom = wall.rect.top
-                #if self.speedy < 0: # Moving up; Hit the bottom side of the wall
-                    #self.box.top = wall.rect.bottom
-
-        print ( "self {},{}".format( self.box.left , self.box.right ) )
+        self.box[0] += self.speedx
+        self.box[1] += self.speedy
+        self.speedx = 0
+        if self.onGround:
+            self.speedy = 0
+        else:
+            self.speedy += planet.gv
 
         if self.showing:
             pg.draw.rect(screen,self.colour,self.box)
+            futureboxY.width -= 40
+            futureboxY.x += 20
+            pg.draw.rect(screen,(255,200,200),futureboxY)
+            futureboxX.height -= 90
+            futureboxX.y += 45
+            pg.draw.rect(screen,(200,255,200),futureboxX)
 
 earth = Planet(bg1, 9.8, "Earth")
 moon = Planet(bg2, 1.62, "Moon")
