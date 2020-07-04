@@ -22,6 +22,7 @@ black = (0,0,0)
 cookie = (171,119,36)
 Grass = (41,204,109)
 Mud = (128,74,52)
+LAVABLE = (255,100,0)
 
 
 #box = pg.Rect(375,250,50,100)
@@ -51,6 +52,8 @@ pg.display.set_caption("Finite State Machines")
 clock = pg.time.Clock()
 
 walls = []
+L3V3L = []
+
 levelone = [
 "                    ",
 "                    ",
@@ -75,7 +78,7 @@ leveltwo = [
 "                    ",
 "                    ",
 "                    ",
-"                    ",
+"            E       ",
 "                    ",
 "                    ",
 "                    ",
@@ -101,25 +104,42 @@ levelthree = [
 "                    ",
 "                    ",
 "                    ",
-"                    ",
+"                   E",
 "WWWWWWWLLLLWWWWWWWWW",
 ]
 
+L3V3L.append(levelone)
+L3V3L.append(leveltwo)
+L3V3L.append(levelthree)
+LEVELNum = 0
 
-x = y = 0
-for row in levelone:
-    for col in row:
-        if col == "W":
-            Wall((x, y), black)
-        if col == "M":
-            Wall((x, y), Mud)
-        if col == "G":
-            Wall((x, y), Grass)
-        if col == "E":
-            end_rect = pg.Rect(x, y, 40, 40)
-        x += wallSize
-    y += wallSize
-    x = 0
+end_rect = pg.Rect(0, 0, 40, 40)
+
+def ChangeLevel(newlevel):
+    global LEVELNum
+    walls.clear()
+    LEVELNum = newlevel
+
+    x = y = 0
+    for row in L3V3L[LEVELNum]:
+        for col in row:
+            if col == "W":
+                Wall((x, y), black)
+            if col == "M":
+                Wall((x, y), Mud)
+            if col == "G":
+                Wall((x, y), Grass)
+            if col == "L":
+                Wall((x, y), LAVABLE)
+            if col == "E":
+                #end_rect = pg.Rect(x, y, 40, 40)
+                end_rect.x = x
+                end_rect.y = y
+            x += wallSize
+        y += wallSize
+        x = 0
+
+ChangeLevel(0)
 
 bg1 = pg.image.load("BG1.jpg")
 bg2 = pg.image.load("CMON.png")
@@ -164,7 +184,7 @@ class Player():
             self.speedx = 10
 
         if keys[self.upKey] == True and self.onGround:
-            self.speedy = -30
+            self.speedy = -50
 
         self.onGround = False # reset onGround flag
 
@@ -233,7 +253,7 @@ moon = Planet(bg2, 1.62, "Moon")
 currentPlanet = earth
 
 def level1():
-    global level, Dead, currentPlanet, earth, moon, Quit
+    global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum
 
     player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, grey2)
     #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l, grey2)
@@ -275,7 +295,9 @@ def level1():
         #pg.draw.rect (screen,Mud, mud)
 
         if player1.box.colliderect(end_rect):
-            nextlevel()
+            print(LEVELNum)
+            ChangeLevel(LEVELNum + 1)
+
         pg.display.flip()
 
         clock.tick(30)
