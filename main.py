@@ -66,7 +66,7 @@ levelone = [
 "                    ",
 "                    ",
 "                    ",
-"       WWWW         ",
+"       WWWW        E",
 ]
 
 leveltwo = [
@@ -115,8 +115,8 @@ for row in levelone:
             Wall((x, y), Mud)
         if col == "G":
             Wall((x, y), Grass)
-        #if col == "E":
-            #end_rect = pygame.Rect(x, y, 20, 20)
+        if col == "E":
+            end_rect = pg.Rect(x, y, 40, 40)
         x += wallSize
     y += wallSize
     x = 0
@@ -137,9 +137,16 @@ Quit = 0
 def printBox( box, name ):
     print("{}, x={}, y={}, w={}, h={} t={} b={}".format( name, box.x, box.y, box.w, box.h, box.top, box.bottom ) )
 
+def nextlevel():
+    if level == 1:
+        pass
+
 class Player():
-    def __init__(self, startX, startY, col, uKey, lKey, rKey):
-        self.box = pg.Rect(startX,startY,50,100)
+    WIDTH = 50
+    HEIGHT = 100
+
+    def __init__(self, startX, startY, col, uKey, lKey, rKey, inSurface):
+        self.box = pg.Rect(startX,startY,Player.WIDTH,Player.HEIGHT)
         self.speedx = 0
         self.speedy = 0
         self.colour = col
@@ -148,15 +155,16 @@ class Player():
         self.rightKey = rKey
         self.showing = False
         self.onGround = False
+        self.oldboxsurface = inSurface
 
     def update( self, planet, keys ):
         if keys[self.leftKey] ==True:
-            self.speedx = -9
+            self.speedx = -10
         elif keys[self.rightKey] ==True:
-            self.speedx = 9
+            self.speedx = 10
 
         if keys[self.upKey] == True and self.onGround:
-            self.speedy = -40
+            self.speedy = -30
 
         self.onGround = False # reset onGround flag
 
@@ -170,13 +178,6 @@ class Player():
         for wall in walls:
             fXCollided = futureboxX.colliderect(wall.rect)
             fYCollided = futureboxY.colliderect(wall.rect)
-            if fXCollided or fYCollided:
-                print ("speed {} {}, fXCollided {}, fYCollided {}".format(self.speedx, self.speedy, fXCollided, fYCollided ) )
-                printBox(wall.rect, "wall.rect")
-                printBox(self.box, "self.box")
-                printBox(futureboxX, "fX")
-                printBox(futureboxY, "fY")
-            #if futurebox.colliderect(wall.rect):
             if self.speedx > 0 and fXCollided: # Moving right; Hit the left side of the wall
                 self.speedx = 0
                 self.box.right = wall.rect.left
@@ -205,22 +206,27 @@ class Player():
             self.speedx = 0
             self.box.left = 0
 
+        oldBox = pg.Rect(self.box)
         self.box[0] += self.speedx
         self.box[1] += self.speedy
-        self.speedx = 0
         if self.onGround:
-            self.speedy = 0
+            self.speedx = 0
         else:
             self.speedy += planet.gv
 
         if self.showing:
+            #pg.draw.rect(screen,(100,100,100),oldBox)
+            screen.blit(self.oldboxsurface, (oldBox.x, oldBox.y) )
             pg.draw.rect(screen,self.colour,self.box)
-            futureboxY.width -= 40
-            futureboxY.x += 20
-            pg.draw.rect(screen,(255,200,200),futureboxY)
-            futureboxX.height -= 90
-            futureboxX.y += 45
-            pg.draw.rect(screen,(200,255,200),futureboxX)
+            futureboxY.width -= Player.WIDTH-10
+            futureboxY.x += (Player.WIDTH-10)/2
+            #pg.draw.rect(screen,(255,200,200),futureboxY)
+            futureboxX.height -= Player.HEIGHT-10
+            futureboxX.y += (Player.HEIGHT-10)/2
+            #pg.draw.rect(screen,(200,255,200),futureboxX)
+
+grey = pg.image.load("TransparentGrey30.png")
+grey2 = pg.transform.scale(grey, (Player.WIDTH, Player.HEIGHT))
 
 earth = Planet(bg1, 9.8, "Earth")
 moon = Planet(bg2, 1.62, "Moon")
@@ -229,8 +235,8 @@ currentPlanet = earth
 def level1():
     global level, Dead, currentPlanet, earth, moon, Quit
 
-    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT)
-    #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l)
+    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, grey2)
+    #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l, grey2)
 
     while level == 0:
         pg.event.pump()
@@ -259,15 +265,17 @@ def level1():
         #if keys[pg.K_1] ==True:
         player1.showing = True
         #if keys[pg.K_2] ==True:
-            #player2.showing = True
+        #player2.showing = True
         player1.update(currentPlanet, keys)
         #player2.update(currentPlanet, keys)
 
         for wall in walls:
             pg.draw.rect(screen, wall.color, wall.rect)
-        #pg.draw.rect(screen, (255, 0, 0), end_rect)
+        pg.draw.rect(screen, (255, 0, 0), end_rect)
         #pg.draw.rect (screen,Mud, mud)
 
+        if player1.box.colliderect(end_rect):
+            nextlevel()
         pg.display.flip()
 
         clock.tick(30)
