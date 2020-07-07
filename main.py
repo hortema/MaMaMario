@@ -126,10 +126,29 @@ levelfour = [
 "WWWWWWWWWWWWWWWWWWEE",
 ]
 
+levelnone = [
+"S W                 ",
+"  W                 ",
+"  W                 ",
+"  W    WWWWW        ",
+"  W    W   W        ",
+"  W    W E W        ",
+"  W    W   W        ",
+"  WWWWWWWWWWWWWWWWWW",
+"                   W",
+"                   W",
+"                   W",
+"                   W",
+"                   W",
+"                   W",
+"WWWWWWWWWWWWWWWWWWWW",
+]
+
 L3V3L.append(levelone)
 L3V3L.append(leveltwo)
 L3V3L.append(levelthree)
 L3V3L.append(levelfour)
+L3V3L.append(levelnone)
 print(len(L3V3L))
 LEVELNum = 0
 
@@ -139,7 +158,7 @@ class Player():
     WIDTH = 50
     HEIGHT = 100
 
-    def __init__(self, startX, startY, col, uKey, lKey, rKey, inSurface):
+    def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface):
         self.box = pg.Rect(startX,startY,Player.WIDTH,Player.HEIGHT)
         self.speedx = 0
         self.speedy = 0
@@ -147,6 +166,7 @@ class Player():
         self.upKey = uKey
         self.leftKey = lKey
         self.rightKey = rKey
+        self.downKey = dKey
         self.showing = False
         self.onGround = False
         self.oldboxsurface = inSurface
@@ -159,6 +179,13 @@ class Player():
 
         if keys[self.upKey] == True and self.onGround:
             self.speedy = -50
+
+        if keys[self.downKey] == True and self.onGround:
+            self.box.height = 50
+            #self.box.top += 50
+        elif keys[self.downKey] == False:
+            self.box.height = Player.HEIGHT
+
 
         self.onGround = False # reset onGround flag
 
@@ -221,6 +248,8 @@ class Player():
 
 def ChangeLevel(newlevel):
     global LEVELNum
+    if newlevel > len(L3V3L):
+        LEVELNum = levelnone
     walls.clear()
     LEVELNum = newlevel
 
@@ -277,7 +306,7 @@ currentPlanet = earth
 def level1():
     global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum
 
-    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, grey2)
+    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, pg.K_DOWN, grey2)
     #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l, grey2)
 
     while level == 0:
