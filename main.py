@@ -55,7 +55,7 @@ walls = []
 L3V3L = []
 
 levelone = [
-"                    ",
+"S                   ",
 "                    ",
 "                    ",
 "                    ",
@@ -73,7 +73,7 @@ levelone = [
 ]
 
 leveltwo = [
-"                    ",
+"S                   ",
 "                    ",
 "                    ",
 "                    ",
@@ -91,7 +91,7 @@ leveltwo = [
 ]
 
 levelthree = [
-"                    ",
+"S                   ",
 "                    ",
 "                    ",
 "                    ",
@@ -108,58 +108,32 @@ levelthree = [
 "WWWWWWWLLLLWWWWWWWWW",
 ]
 
+levelfour = [
+"S                   ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"                    ",
+"   WWWWWWWWWWWWWWWWW",
+"   W                ",
+"   W                ",
+"   W                ",
+"   WW   WWWWWWWWW   ",
+"        WWWWWWWWW   ",
+"        WWWWWWWWWW  ",
+"WWWWWWWWWWWWWWWWWWEE",
+]
+
 L3V3L.append(levelone)
 L3V3L.append(leveltwo)
 L3V3L.append(levelthree)
+L3V3L.append(levelfour)
+print(len(L3V3L))
 LEVELNum = 0
 
 end_rect = pg.Rect(0, 0, 40, 40)
-
-def ChangeLevel(newlevel):
-    global LEVELNum
-    walls.clear()
-    LEVELNum = newlevel
-
-    x = y = 0
-    for row in L3V3L[LEVELNum]:
-        for col in row:
-            if col == "W":
-                Wall((x, y), black)
-            if col == "M":
-                Wall((x, y), Mud)
-            if col == "G":
-                Wall((x, y), Grass)
-            if col == "L":
-                Wall((x, y), LAVABLE)
-            if col == "E":
-                #end_rect = pg.Rect(x, y, 40, 40)
-                end_rect.x = x
-                end_rect.y = y
-            x += wallSize
-        y += wallSize
-        x = 0
-
-ChangeLevel(0)
-
-bg1 = pg.image.load("BG1.jpg")
-bg2 = pg.image.load("CMON.png")
-
-class Planet():
-    def __init__(self, inBG, inGv, inName):
-        self.bg = inBG
-        self.gv = inGv
-        self.name = inName
-level = 0
-Dead = 1
-
-Quit = 0
-
-def printBox( box, name ):
-    print("{}, x={}, y={}, w={}, h={} t={} b={}".format( name, box.x, box.y, box.w, box.h, box.top, box.bottom ) )
-
-def nextlevel():
-    if level == 1:
-        pass
 
 class Player():
     WIDTH = 50
@@ -245,6 +219,54 @@ class Player():
             futureboxX.y += (Player.HEIGHT-10)/2
             #pg.draw.rect(screen,(200,255,200),futureboxX)
 
+def ChangeLevel(newlevel):
+    global LEVELNum
+    walls.clear()
+    LEVELNum = newlevel
+
+    playerx = 0
+    playery = 0
+
+    x = y = 0
+    for row in L3V3L[LEVELNum]:
+        for col in row:
+            if col == "W":
+                Wall((x, y), black)
+            if col == "M":
+                Wall((x, y), Mud)
+            if col == "G":
+                Wall((x, y), Grass)
+            if col == "L":
+                Wall((x, y), LAVABLE)
+            if col == "S":
+                playerx = x
+                playery = y
+            if col == "E":
+                #end_rect = pg.Rect(x, y, 40, 40)
+                end_rect.x = x
+                end_rect.y = y
+            x += wallSize
+        y += wallSize
+        x = 0
+    return(playerx,playery)
+ChangeLevel(0)
+
+bg1 = pg.image.load("BG1.jpg")
+bg2 = pg.image.load("CMON.png")
+
+class Planet():
+    def __init__(self, inBG, inGv, inName):
+        self.bg = inBG
+        self.gv = inGv
+        self.name = inName
+level = 0
+Dead = 1
+
+Quit = 0
+
+def printBox( box, name ):
+    print("{}, x={}, y={}, w={}, h={} t={} b={}".format( name, box.x, box.y, box.w, box.h, box.top, box.bottom ) )
+
 grey = pg.image.load("TransparentGrey30.png")
 grey2 = pg.transform.scale(grey, (Player.WIDTH, Player.HEIGHT))
 
@@ -291,12 +313,13 @@ def level1():
 
         for wall in walls:
             pg.draw.rect(screen, wall.color, wall.rect)
-        pg.draw.rect(screen, (255, 0, 0), end_rect)
+            pg.draw.rect(screen, (255, 0, 0), end_rect)
         #pg.draw.rect (screen,Mud, mud)
 
         if player1.box.colliderect(end_rect):
             print(LEVELNum)
-            ChangeLevel(LEVELNum + 1)
+            player1.box.topleft = ChangeLevel(LEVELNum + 1)
+
 
         pg.display.flip()
 
