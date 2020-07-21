@@ -157,6 +157,7 @@ end_rect = pg.Rect(0, 0, 40, 40)
 class Player():
     WIDTH = 50
     HEIGHT = 100
+    CROUTCH = 10
 
     def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface):
         self.box = pg.Rect(startX,startY,Player.WIDTH,Player.HEIGHT)
@@ -170,6 +171,7 @@ class Player():
         self.showing = False
         self.onGround = False
         self.oldboxsurface = inSurface
+        self.crouching = False
 
     def update( self, planet, keys ):
         if keys[self.leftKey] ==True:
@@ -180,11 +182,14 @@ class Player():
         if keys[self.upKey] == True and self.onGround:
             self.speedy = -50
 
-        if keys[self.downKey] == True and self.onGround:
-            self.box.height = 50
-            #self.box.top += 50
-        elif keys[self.downKey] == False:
+        if keys[self.downKey] == True and self.onGround and self.crouching == False:
+            self.box.height = Player.CROUTCH
+            self.box.top += Player.HEIGHT-Player.CROUTCH
+            self.crouching = True
+        elif keys[self.downKey] == False and self.crouching == True:
             self.box.height = Player.HEIGHT
+            self.box.top -= Player.HEIGHT-Player.CROUTCH
+            self.crouching = False
 
 
         self.onGround = False # reset onGround flag
