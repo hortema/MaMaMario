@@ -1,4 +1,4 @@
-#v1.5
+#v1.7
 import pygame as pg
 import sys
 
@@ -156,7 +156,7 @@ end_rect = pg.Rect(0, 0, 40, 40)
 
 class Player():
     WIDTH = 50
-    HEIGHT = 100
+    HEIGHT = 125
     CROUTCH = 10
 
     def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface):
