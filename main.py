@@ -179,6 +179,12 @@ class Player():
         elif keys[self.rightKey] ==True:
             self.speedx = 10
 
+        if keys[self.rightKey] ==True and self.crouching == True:
+            self.speedx = 30
+
+        elif keys[self.leftKey] ==True and self.crouching == True:
+            self.speedx = -30
+
         if keys[self.upKey] == True and self.onGround:
             self.speedy = -50
 
@@ -309,7 +315,7 @@ moon = Planet(bg2, 1.62, "Moon")
 currentPlanet = earth
 
 def level1():
-    global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum
+    global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum, grey2
 
     player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, pg.K_DOWN, grey2)
     #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l, grey2)
@@ -353,7 +359,6 @@ def level1():
         if player1.box.colliderect(end_rect):
             print(LEVELNum)
             player1.box.topleft = ChangeLevel(LEVELNum + 1)
-
 
         pg.display.flip()
 
