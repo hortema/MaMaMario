@@ -156,8 +156,8 @@ end_rect = pg.Rect(0, 0, 40, 40)
 
 class Player():
     WIDTH = 50
-    HEIGHT = 125
-    CROUTCH = 10
+    HEIGHT = 100
+    CROUTCH = 12
 
     def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface):
         self.box = pg.Rect(startX,startY,Player.WIDTH,Player.HEIGHT)
