@@ -1,4 +1,4 @@
-#v1.7
+#v2
 import pygame as pg
 import sys
 
@@ -134,7 +134,7 @@ levelnone = [
 "  W    W   W        ",
 "  W    W E W        ",
 "  W    W   W        ",
-"  WWWWWWWWWWWWWWWWWW",
+"  WWWWWW   WWWWWWWWW",
 "                   W",
 "                   W",
 "                   W",
@@ -155,11 +155,12 @@ LEVELNum = 0
 end_rect = pg.Rect(0, 0, 40, 40)
 
 class Player():
+
     WIDTH = 50
     HEIGHT = 100
     CROUTCH = 12
 
-    def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface):
+    def __init__(self, startX, startY, col, uKey, lKey, rKey, dKey, inSurface, idleP, duckP):
         self.box = pg.Rect(startX,startY,Player.WIDTH,Player.HEIGHT)
         self.speedx = 0
         self.speedy = 0
@@ -172,8 +173,11 @@ class Player():
         self.onGround = False
         self.oldboxsurface = inSurface
         self.crouching = False
+        self.IDLE = idleP
+        self.DUCK = duckP
 
     def update( self, planet, keys ):
+
         if keys[self.leftKey] ==True:
             self.speedx = -10
         elif keys[self.rightKey] ==True:
@@ -193,6 +197,8 @@ class Player():
             self.box.top += Player.HEIGHT-Player.CROUTCH
             self.crouching = True
         elif keys[self.downKey] == False and self.crouching == True:
+            ink = pg.transform.scale(ink1, (Player.WIDTH, Player.CROUTCH))
+            screen.blit(self.DUCK,self.box)
             self.box.height = Player.HEIGHT
             self.box.top -= Player.HEIGHT-Player.CROUTCH
             self.crouching = False
@@ -310,14 +316,20 @@ def printBox( box, name ):
 grey = pg.image.load("TransparentGrey30.png")
 grey2 = pg.transform.scale(grey, (Player.WIDTH, Player.HEIGHT))
 
+ink1 = pg.image.load("DUCK.png")
+ink = pg.transform.scale(ink1, (Player.WIDTH, Player.CROUTCH))
+
+human1 = pg.image.load("human.png")
+human = pg.transform.scale(human1, (Player.WIDTH, Player.HEIGHT))
+
 earth = Planet(bg1, 9.8, "Earth")
 moon = Planet(bg2, 1.62, "Moon")
 currentPlanet = earth
 
 def level1():
-    global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum, grey2
+    global level, Dead, currentPlanet, earth, moon, Quit, LEVELNum, grey2, ink, human
 
-    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, pg.K_DOWN, grey2)
+    player1 = Player(10,250,white, pg.K_UP, pg.K_LEFT, pg.K_RIGHT, pg.K_DOWN, grey2, human, ink)
     #player2 = Player(10,250,blue, pg.K_i, pg.K_j, pg.K_l, grey2)
 
     while level == 0:
