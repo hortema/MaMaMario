@@ -171,23 +171,33 @@ class Player():
         self.downKey = dKey
         self.showing = False
         self.onGround = False
-        self.oldboxsurface = inSurface
+        self.oldboxsurface = inSurface #for the oldbox because i want to draw the old box as translucent gray image.
         self.crouching = False
         self.IDLE = idleP
         self.DUCK = duckP
+        self.left = False
+        self.right = True
 
     def update( self, planet, keys ):
 
         if keys[self.leftKey] ==True:
             self.speedx = -10
+            self.right = True
+            self.left = False
         elif keys[self.rightKey] ==True:
             self.speedx = 10
+            self.right = True
+            self.left = False
 
         if keys[self.rightKey] ==True and self.crouching == True:
             self.speedx = 30
+            self.left = True
+            self.right = False
 
         elif keys[self.leftKey] ==True and self.crouching == True:
             self.speedx = -30
+            self.left = True
+            self.right = False
 
         if keys[self.upKey] == True and self.onGround:
             self.speedy = -50
@@ -197,8 +207,6 @@ class Player():
             self.box.top += Player.HEIGHT-Player.CROUTCH
             self.crouching = True
         elif keys[self.downKey] == False and self.crouching == True:
-            ink = pg.transform.scale(ink1, (Player.WIDTH, Player.CROUTCH))
-            screen.blit(self.DUCK,self.box)
             self.box.height = Player.HEIGHT
             self.box.top -= Player.HEIGHT-Player.CROUTCH
             self.crouching = False
@@ -254,8 +262,17 @@ class Player():
 
         if self.showing:
             #pg.draw.rect(screen,(100,100,100),oldBox)
-            screen.blit(self.oldboxsurface, (oldBox.x, oldBox.y) )
-            pg.draw.rect(screen,self.colour,self.box)
+            #screen.blit(self.oldboxsurface, (oldBox.x, oldBox.y) ) #drawing the old box using the surface that holds the grey image. #commented out (for now)
+            #pg.draw.rect(screen,self.colour,self.box)
+            if self.crouching == False:
+                screen.blit(self.IDLE, (self.box.x,self.box.y)) #draw the idle player picture
+            else:
+                screen.blit(self.DUCK, (self.box.x,self.box.y)) #draw the ducking player picture
+
+            if self.crouching == False and self.right == True:
+                self.surface = pg.transform.flip(self.IDLE, False, True)
+            elif self.crouching == False and self.left == True:
+                self.surface = pg.transform.flip(self.IDLE, True, False)
             futureboxY.width -= Player.WIDTH-10
             futureboxY.x += (Player.WIDTH-10)/2
             #pg.draw.rect(screen,(255,200,200),futureboxY)
